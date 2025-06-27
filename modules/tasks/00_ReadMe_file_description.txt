@@ -1,0 +1,2 @@
+- /modules/tasks/AddTask.tsx – Input field + "Add" button
+- /modules/tasks/TaskListScreen.tsx – FlatList view styled like a notepad

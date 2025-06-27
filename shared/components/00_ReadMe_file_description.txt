@@ -1,0 +1,1 @@
+- /shared/components/TaskCard.tsx – Compact card-like view of a task

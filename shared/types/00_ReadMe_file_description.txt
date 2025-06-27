@@ -1,0 +1,1 @@
+- Task.ts - This defines the shape of a task across your whole app—storage, logic, and UI can all rely on it.
