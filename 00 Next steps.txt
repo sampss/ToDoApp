@@ -1,0 +1,5 @@
+This module is ready to drop into your screen logic. Next up, we can:
+- 🔗 Integrate openDB() into your app startup
+- ⬇️ Load saved tasks on screen load
+- ➕ Replace dummy state with addTask() for persistence
+Want me to walk you through hooking this into TaskListScreen.tsx next? We’ll wire it to show your SQLite-backed list live.
