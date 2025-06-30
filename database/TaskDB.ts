@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage';
-import { Task } from '../shared/types/Task';
+import { Task } from '@typesafe/Task';
 
 SQLite.enablePromise(true);
 
