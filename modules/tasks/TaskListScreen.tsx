@@ -77,27 +77,12 @@ const TaskListScreen: React.FC = () => {
     setTasks(prev => prev.filter(task => !task.completed));
   };
 
-  const handleDeleteTask = (taskId: number) => {
-    const taskToDelete = tasks.find(t => t.id === taskId);
-    if (!taskToDelete) return;
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
-    InteractionManager.runAfterInteractions(() => {
-      Alert.alert(
-        'Delete Task',
-        `Are you sure you want to delete "${taskToDelete.title}"? This action cannot be undone.`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Delete',
-            style: 'destructive',
-            onPress: () => {
-              setTasks(prev => prev.filter(task => task.id !== taskId));
-            },
-          },
-        ],
-        { cancelable: true }
-      );
-    });
+  const confirmDelete = (taskId: number) => {
+    setPendingDeleteId(taskId);
+    setDeleteModalVisible(true);
   };
 
   const isMountedRef = useRef(true);
@@ -211,10 +196,43 @@ const TaskListScreen: React.FC = () => {
         <TaskCard
           task={item}
           onToggleComplete={handleToggleComplete}
-          onDelete={handleDeleteTask} // 👈 Add this line
+          onDelete={confirmDelete}
         />
       )}
     />
+    {deleteModalVisible && (
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalBox}>
+          <Text style={styles.modalTitle}>Delete Task?</Text>
+          <Text style={styles.modalMessage}>This will permanently delete the task.</Text>
+
+          <View style={styles.modalButtons}>
+            <Pressable
+              onPress={() => {
+                setDeleteModalVisible(false);
+                setPendingDeleteId(null);
+              }}
+              style={[styles.modalButton, styles.cancelButton]}
+            >
+              <Text style={styles.buttonText}>Cancel</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                if (pendingDeleteId !== null) {
+                  setTasks(prev => prev.filter(task => task.id !== pendingDeleteId));
+                }
+                setDeleteModalVisible(false);
+                setPendingDeleteId(null);
+              }}
+              style={[styles.modalButton, styles.deleteButton]}
+            >
+              <Text style={styles.buttonText}>Delete</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    )}
     </View>
   );
 };
@@ -309,6 +327,59 @@ const styles = StyleSheet.create({
     color: '#444',
     fontWeight: '500',
   },
+  modalOverlay: {
+  position: 'absolute',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.4)',
+  justifyContent: 'center',
+  alignItems: 'center',
+  zIndex: 1000,
+},
+
+modalBox: {
+  width: '80%',
+  backgroundColor: '#fff',
+  borderRadius: 8,
+  padding: 20,
+  elevation: 4,
+},
+
+modalTitle: {
+  fontSize: 18,
+  fontWeight: '600',
+  marginBottom: 8,
+},
+
+modalMessage: {
+  fontSize: 14,
+  color: '#555',
+  marginBottom: 16,
+},
+
+modalButtons: {
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+},
+
+modalButton: {
+  paddingVertical: 8,
+  paddingHorizontal: 16,
+  marginLeft: 8,
+  borderRadius: 4,
+},
+
+cancelButton: {
+  backgroundColor: '#eee',
+},
+
+deleteButton: {
+  backgroundColor: '#d22',
+},
+
+buttonText: {
+  color: '#fff',
+  fontWeight: '600',
+},
 });
 
 export default TaskListScreen;
