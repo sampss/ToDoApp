@@ -24,6 +24,9 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({
     <View style={styles.wrapper}>
     {topText && <Text style={styles.top}>{topText}</Text>}
 
+    <View style={styles.buttonRow}>
+    {leftText && <Text style={styles.side}>{leftText}</Text>}
+
     <Pressable
         onPress={onPress}
         style={({ pressed }) => [
@@ -34,12 +37,12 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({
         disabled={disabled}
     >
         <Text style={styles.buttonText}>
-            {leftText ? `${leftText + ' '} ` : ''}
-            {centerText || 'Archive'}
-            {rightText ? ` ${' ' + rightText}` : ''}
+        {centerText || 'Archive Completed'}
         </Text>
-
     </Pressable>
+
+    {rightText && <Text style={styles.side}>{rightText}</Text>}
+    </View>
 
     {bottomText && <Text style={styles.bottom}>{bottomText}</Text>}
     </View>
@@ -118,6 +121,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+    },
+    left: {
+    fontSize: 20,
+    marginBottom: 4,
+    alignSelf: 'center',
+    },
+
+    right: {
+    fontSize: 20,
+    marginTop: 4,
+    alignSelf: 'center',
+    },
+    buttonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 6,
+    },
+    side: {
+    fontSize: 20,
+    marginHorizontal: 8,
     },
 });
 
