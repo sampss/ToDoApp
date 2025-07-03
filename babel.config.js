@@ -13,6 +13,7 @@ module.exports = {
           '@components': './shared/components',
           '@modules': './modules',
           '@tasks': './modules/tasks',
+          '@services': './shared/services',
         },
       },
     ],

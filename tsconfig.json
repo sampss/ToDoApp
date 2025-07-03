@@ -9,7 +9,8 @@
       "@typesafe/*": ["./shared/types/*"],
       "@components/*": ["./shared/components/*"],
       "@modules/*": ["./modules/*"],
-      "@tasks/*": ["./modules/tasks/*"]
+      "@tasks/*": ["./modules/tasks/*"],
+      "@services/*": ["./shared/services/*"],
     }
   }
 }

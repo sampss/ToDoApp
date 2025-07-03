@@ -3,12 +3,20 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 
 type ArchiveButtonProps = {
   onPress: () => void;
-  topText?: string;
-  bottomText?: string;
-  leftText?: string;
-  rightText?: string;
-  centerText?: string;
-  disabled?: boolean;
+    topText?: string;
+    bottomText?: string;
+    leftText?: string;
+    rightText?: string;
+    centerText?: string;
+    disabled?: boolean;
+    btnColor?: 'green' | 'blue' | 'red' | 'yellow';  // ✨ new prop
+};
+
+const buttonColors = {
+  green: '#28a745',
+  blue: '#007bff',
+  red: '#dc3545',
+  yellow: '#ffc107',
 };
 
 const ArchiveButton: React.FC<ArchiveButtonProps> = ({
@@ -19,32 +27,38 @@ const ArchiveButton: React.FC<ArchiveButtonProps> = ({
   leftText,
   rightText,
   disabled = false,
+  btnColor = 'blue', // Default fallback
 }) => {
+  const validColors = ['green', 'blue', 'red', 'yellow'] as const;
+  const safeColor = validColors.includes(btnColor) ? btnColor : 'green';
+  const backgroundColor = buttonColors[safeColor];
+
   return (
     <View style={styles.wrapper}>
-    {topText && <Text style={styles.top}>{topText}</Text>}
+      {topText && <Text style={styles.top}>{topText}</Text>}
 
-    <View style={styles.buttonRow}>
-    {leftText && <Text style={styles.side}>{leftText}</Text>}
+      <View style={styles.buttonRow}>
+        {leftText && <Text style={styles.side}>{leftText}</Text>}
 
-    <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-        styles.boxButton,
-        disabled && styles.disabled,
-        pressed && styles.pressed,
-        ]}
-        disabled={disabled}
-    >
-        <Text style={styles.buttonText}>
-        {centerText || 'Archive Completed'}
-        </Text>
-    </Pressable>
+        <Pressable
+          onPress={onPress}
+          style={({ pressed }) => [
+            styles.boxButton,
+            { backgroundColor },
+            disabled && styles.disabled,
+            pressed && styles.pressed,
+          ]}
+          disabled={disabled}
+        >
+          <Text style={styles.buttonText}>
+            {centerText || 'Archive Completed'}
+          </Text>
+        </Pressable>
 
-    {rightText && <Text style={styles.side}>{rightText}</Text>}
-    </View>
+        {rightText && <Text style={styles.side}>{rightText}</Text>}
+      </View>
 
-    {bottomText && <Text style={styles.bottom}>{bottomText}</Text>}
+      {bottomText && <Text style={styles.bottom}>{bottomText}</Text>}
     </View>
   );
 };
@@ -77,9 +91,13 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
     },
     buttonText: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    textShadowColor: '#000',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1.5,
+
     },
     icon: {
         fontSize: 18,

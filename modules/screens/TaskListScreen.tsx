@@ -15,6 +15,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Task } from '@typesafe/Task';
 import TaskCard from '@components/TaskCard';
 import ArchiveButton from '@shared/components/ArchiveButton';
+import { archiveCompletedTasks } from '@services/ArchiveService';
+import { mockArchiveWrite } from '@services/ArchiveService'; // Or use real DB write logic
 
 const TaskListScreen: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -24,6 +26,25 @@ const TaskListScreen: React.FC = () => {
   const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [displayedTasks, setDisplayedTasks] = useState<Task[]>([]);
+
+  const handleArchiveSelected = async () => {
+    const selected = tasks.filter(t => t.completed);
+    if (selected.length === 0) {
+      console.log('⚠️ No tasks selected to archive.');
+      return;
+    }
+
+    try {
+      await archiveCompletedTasks(selected, mockArchiveWrite, { appId: 'ToDoApp' });
+
+      const remaining = tasks.filter(t => !t.completed);
+      setTasks(remaining); // ✅ Update displayed list
+      console.log('✅ Archived and updated task list.');
+    } catch (error) {
+      console.error('🛑 Archive failed:', error);
+    }
+  };
+
 
   const applyFilters = () => {
     const normalized = query.toLowerCase();
@@ -99,12 +120,9 @@ const TaskListScreen: React.FC = () => {
       <View style={styles.headerRow}>
         <Text style={styles.header}>📝 To-Do List</Text>
         <ArchiveButton 
-          onPress={handleArchiveCompleted}
-          topText='Archive'
-          leftText='📦'
-          centerText='Archive'
-          rightText='📦'
-          bottomText='Archive' />
+          onPress={handleArchiveSelected}
+          centerText='📦'
+          btnColor='green' />
       </View>
 
       <View style={styles.inputRow}>
