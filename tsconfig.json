@@ -3,11 +3,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"],
-      "@utils/*": ["shared/utils/*"],
-      "@typesafe/*": ["shared/types/*"],
-      "@components/*": ["shared/components/*"],
-      "@modules/*": ["apps/ToDoApp/modules/*"]
+      "@screens/*": ["./modules/screens/*"],
+      "@shared/*": ["./shared/*"],
+      "@utils/*": ["./shared/utils/*"],
+      "@typesafe/*": ["./shared/types/*"],
+      "@components/*": ["./shared/components/*"],
+      "@modules/*": ["./modules/*"],
+      "@tasks/*": ["./modules/tasks/*"]
     }
   }
 }

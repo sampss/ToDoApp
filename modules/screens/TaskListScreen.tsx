@@ -14,6 +14,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Task } from '@typesafe/Task';
 import TaskCard from '@components/TaskCard';
+import ArchiveButton from '@shared/components/ArchiveButton';
 
 const TaskListScreen: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -97,9 +98,13 @@ const TaskListScreen: React.FC = () => {
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>📝 To-Do List</Text>
-        <Pressable onPress={handleArchiveCompleted} style={styles.archiveButton}>
-          <Text style={styles.archiveButtonText}>📦</Text>
-        </Pressable>
+        <ArchiveButton 
+          onPress={handleArchiveCompleted}
+          topText='Archive'
+          leftText='📦'
+          centerText='Archive'
+          rightText='📦'
+          bottomText='Archive' />
       </View>
 
       <View style={styles.inputRow}>

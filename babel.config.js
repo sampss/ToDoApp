@@ -6,11 +6,13 @@ module.exports = {
       {
         root: ['./'],
         alias: {
+          '@screens': './modules/screens',
           '@shared': './shared',
           '@utils': './shared/utils',
           '@typesafe': './shared/types',
           '@components': './shared/components',
-          '@modules': './apps/ToDoApp/modules',
+          '@modules': './modules',
+          '@tasks': './modules/tasks',
         },
       },
     ],
