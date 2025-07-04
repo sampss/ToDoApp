@@ -1,43 +1,81 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import { Task } from '@typesafe/Task';
+import { Task } from 'modules/types/Task';
 import DateUtils from '@utils/dateUtils';
+import TaskDetailsModal from '@components/TaskDetailsModal';
 
 type Props = {
   task: Task;
   onToggleComplete: (taskId: number) => void;
   onDelete: (taskId: number) => void;
+  onUpdateDetails?: (id: number, details: string) => void;
 };
 
-const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete }) => {
+const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateDetails }) => {
+  const [detailsOpen, setDetailsOpen] = useState(false);
+
   const isOverdue =
     task.completeBy &&
     new Date(task.completeBy) < new Date() &&
     !task.completed;
 
+  const handleDetailsSave = (id: number, newDetails: string) => {
+    if (onUpdateDetails) {
+      onUpdateDetails(id, newDetails);
+    }
+  };
+
   return (
     <View style={styles.card}>
-      <View style={styles.cardRow}>
-        <TouchableOpacity onPress={() => onToggleComplete(task.id)} style={styles.cardContent}>
-          <Text style={styles.title}>
-            {task.completed ? '✅' : '⬜️'} {task.title}
-          </Text>
-
-          {task.completeBy && (
-            <Text style={[styles.due, isOverdue && styles.overdue]}>
-              📅 Complete by: {DateUtils.formatDateForUI(task.completeBy)}
-            </Text>
-          )}
-
-          <Text style={styles.timestamp}>
-            Created: {DateUtils.formatDateForUI(task.createdAt)}
-          </Text>
-        </TouchableOpacity>
-
-        <Pressable onPress={() => onDelete(task.id)} style={styles.trashButton}>
-          <Text style={styles.trashIcon}>🗑️</Text>
-        </Pressable>
+      {/* Top Row: DETAILS Center + Pencil Right */}
+      <View style={styles.topRow}>
+        <View style={styles.detailsWrapper}>
+          <Text style={styles.detailsLink} onPress={() => setDetailsOpen(true)}>DETAILS</Text>
+        </View>
+        <View style={styles.pencilWrapper}>
+          <Pressable onPress={() => setDetailsOpen(true)} style={styles.iconButton}>
+            <Text style={styles.editIcon}>✏️</Text>
+          </Pressable>
+        </View>
       </View>
+
+      {/* Main Row: Task Info + Trash */}
+      <View style={styles.cardRow}>
+        {/* Left Side: Task Info */}
+        <View style={styles.cardContent}>
+          <TouchableOpacity onPress={() => onToggleComplete(task.id)}>
+            <Text style={styles.title}>
+              {task.completed ? '✅' : '⬜️'} {task.title}
+            </Text>
+
+            {task.completeBy && (
+              <Text style={[styles.due, isOverdue && styles.overdue]}>
+                📅 Complete by: {DateUtils.formatDateForUI(task.completeBy)}
+              </Text>
+            )}
+
+            <Text style={styles.timestamp}>
+              Created: {DateUtils.formatDateForUI(task.createdAt)}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Right Side: Trash anchored to bottom */}
+        <View style={styles.rightBlock}>
+          <View style={{ flex: 1 }} />
+          <Pressable onPress={() => onDelete(task.id)} style={styles.iconButton}>
+            <Text style={styles.trashIcon}>🗑️</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* Modal */}
+      <TaskDetailsModal
+        task={task}
+        visible={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        onSave={(newDetails) => handleDetailsSave(task.id, newDetails)}
+      />
     </View>
   );
 };
@@ -51,13 +89,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
   },
-  cardRow: {
+  topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    marginBottom: 6,
+  },
+  detailsWrapper: {
+    flex: 1.5,
+    alignItems: 'flex-end',
+  },
+  pencilWrapper: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  detailsLink: {
+    fontSize: 14,
+    textDecorationLine: 'underline',
+    color: '#007bff',
+    fontWeight: '600',
+  },
+  cardRow: {
+    flexDirection: 'row',
   },
   cardContent: {
-    flex: 1,
+    flex: 2,
+  },
+  rightBlock: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingVertical: 4,
   },
   title: {
     fontSize: 16,
@@ -77,9 +138,12 @@ const styles = StyleSheet.create({
     color: '#777',
     marginTop: 4,
   },
-  trashButton: {
-    padding: 6,
-    marginLeft: 12,
+  iconButton: {
+    padding: 4,
+  },
+  editIcon: {
+    fontSize: 18,
+    color: '#007bff',
   },
   trashIcon: {
     fontSize: 18,

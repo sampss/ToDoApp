@@ -95,9 +95,13 @@ const TaskListScreen: React.FC = () => {
     );
   };
 
-  const handleArchiveCompleted = () => {
-    setTasks(prev => prev.filter(task => !task.completed));
-  };
+  const handleUpdateDetails = (id: number, newDetails: string) => {
+  setTasks(prev =>
+    prev.map(task =>
+      task.id === id ? { ...task, details: newDetails } : task
+    )
+  );
+};
 
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
@@ -216,11 +220,12 @@ const TaskListScreen: React.FC = () => {
       data={displayedTasks}
       keyExtractor={item => item.id.toString()}
       renderItem={({ item }) => (
-        <TaskCard
-          task={item}
-          onToggleComplete={handleToggleComplete}
-          onDelete={confirmDelete}
-        />
+      <TaskCard
+        task={item}
+        onToggleComplete={handleToggleComplete}
+        onDelete={confirmDelete}
+        onUpdateDetails={handleUpdateDetails}  // ✨ Added here
+      />
       )}
     />
     {deleteModalVisible && (

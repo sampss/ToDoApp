@@ -4,8 +4,8 @@ export interface Task {
   completed: boolean;
   createdAt: string;
   completeBy?: string;
+  details?: string; // ✨ new field for custom notes or description
 }
-
 
 
 /* Heavily commented code explaining in detail
