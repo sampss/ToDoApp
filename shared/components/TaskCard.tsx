@@ -11,8 +11,9 @@ type Props = {
   onUpdateDetails?: (id: number, details: string) => void;
 };
 
-const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateDetails }) => {
+  const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateDetails }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
 
   const isOverdue =
     task.completeBy &&
@@ -33,7 +34,12 @@ const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateD
           <Text style={styles.detailsLink} onPress={() => setDetailsOpen(true)}>DETAILS</Text>
         </View>
         <View style={styles.pencilWrapper}>
-          <Pressable onPress={() => setDetailsOpen(true)} style={styles.iconButton}>
+          <Pressable
+            onPress={() => {
+              setDetailsOpen(true);
+              setEditMode(true);
+            }}
+          >
             <Text style={styles.editIcon}>✏️</Text>
           </Pressable>
         </View>
@@ -69,11 +75,14 @@ const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateD
         </View>
       </View>
 
-      {/* Modal */}
       <TaskDetailsModal
         task={task}
         visible={detailsOpen}
-        onClose={() => setDetailsOpen(false)}
+        initialEditMode={editMode} // ✨ Add this line
+        onClose={() => {
+          setDetailsOpen(false);
+          setEditMode(false);
+        }}
         onSave={(newDetails) => handleDetailsSave(task.id, newDetails)}
       />
     </View>

@@ -164,7 +164,7 @@ const TaskListScreen: React.FC = () => {
                 : '📅 Due Date'
               : filterDate
                 ? `🔎 ${new Date(filterDate).toDateString()}`
-                : '🔎 Filter by Date'}
+                : '🔎 Filter Due Date'}
           </Text>
         </Pressable>
 
