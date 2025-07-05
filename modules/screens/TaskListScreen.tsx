@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   FlatList,
@@ -8,43 +8,31 @@ import {
   TextInput,
   Button,
   Platform,
-  Alert, 
-  InteractionManager,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Task } from '@typesafe/Task';
 import TaskCard from '@components/TaskCard';
 import ArchiveButton from '@shared/components/ArchiveButton';
 import { archiveCompletedTasks } from '@services/ArchiveService';
-import { mockArchiveWrite } from '@services/ArchiveService'; // Or use real DB write logic
+import { mockArchiveWrite } from '@services/ArchiveService';
 
 const TaskListScreen: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [query, setQuery] = useState('');
   const [mode, setMode] = useState<'add' | 'search'>('add');
-  const [completeBy, setCompleteBy] = useState<string | undefined>(undefined);
-  const [filterDate, setFilterDate] = useState<string | undefined>(undefined);
+  const [completeBy, setCompleteBy] = useState<string | undefined>();
+  const [filterDate, setFilterDate] = useState<string | undefined>();
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [displayedTasks, setDisplayedTasks] = useState<Task[]>([]);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const isMountedRef = useRef(true);
 
-  const handleArchiveSelected = async () => {
-    const selected = tasks.filter(t => t.completed);
-    if (selected.length === 0) {
-      console.log('⚠️ No tasks selected to archive.');
-      return;
-    }
-
-    try {
-      await archiveCompletedTasks(selected, mockArchiveWrite, { appId: 'ToDoApp' });
-
-      const remaining = tasks.filter(t => !t.completed);
-      setTasks(remaining); // ✅ Update displayed list
-      console.log('✅ Archived and updated task list.');
-    } catch (error) {
-      console.error('🛑 Archive failed:', error);
-    }
-  };
-
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const applyFilters = () => {
     const normalized = query.toLowerCase();
@@ -81,6 +69,7 @@ const TaskListScreen: React.FC = () => {
       completed: false,
       createdAt: new Date().toISOString(),
       completeBy: date,
+      details: '',
     };
     setTasks([newTask, ...tasks]);
     setQuery('');
@@ -95,38 +84,47 @@ const TaskListScreen: React.FC = () => {
     );
   };
 
-  const handleUpdateDetails = (id: number, newDetails: string) => {
-  setTasks(prev =>
-    prev.map(task =>
-      task.id === id ? { ...task, details: newDetails } : task
-    )
-  );
-};
-
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
-  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+  const handleUpdateDetails = (id: number, newDetails: string, newDate?: string) => {
+    setTasks(prev =>
+      prev.map(task =>
+        task.id === id
+          ? { ...task, details: newDetails, completeBy: newDate ?? task.completeBy }
+          : task
+      )
+    );
+  };
 
   const confirmDelete = (taskId: number) => {
     setPendingDeleteId(taskId);
     setDeleteModalVisible(true);
   };
 
-  const isMountedRef = useRef(true);
+  const handleArchiveSelected = async () => {
+    const selected = tasks.filter(t => t.completed);
+    if (selected.length === 0) {
+      console.log('⚠️ No tasks selected to archive.');
+      return;
+    }
 
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
+    try {
+      await archiveCompletedTasks(selected, mockArchiveWrite, { appId: 'ToDoApp' });
+      const remaining = tasks.filter(t => !t.completed);
+      setTasks(remaining);
+      console.log('✅ Archived and updated task list.');
+    } catch (error) {
+      console.error('🛑 Archive failed:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
         <Text style={styles.header}>📝 To-Do List</Text>
-        <ArchiveButton 
+        <ArchiveButton
           onPress={handleArchiveSelected}
-          centerText='📦'
-          btnColor='green' />
+          centerText="📦"
+          btnColor="green"
+        />
       </View>
 
       <View style={styles.inputRow}>
@@ -216,54 +214,56 @@ const TaskListScreen: React.FC = () => {
         />
       )}
 
-    <FlatList
-      data={displayedTasks}
-      keyExtractor={item => item.id.toString()}
-      renderItem={({ item }) => (
-      <TaskCard
-        task={item}
-        onToggleComplete={handleToggleComplete}
-        onDelete={confirmDelete}
-        onUpdateDetails={handleUpdateDetails}  // ✨ Added here
+      <FlatList
+        data={displayedTasks}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => (
+          <TaskCard
+            task={item}
+            onToggleComplete={handleToggleComplete}
+            onDelete={confirmDelete}
+            onUpdateDetails={handleUpdateDetails}
+          />
+        )}
       />
-      )}
-    />
-    {deleteModalVisible && (
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalBox}>
-          <Text style={styles.modalTitle}>Delete Task?</Text>
-          <Text style={styles.modalMessage}>This will permanently delete the task.</Text>
 
-          <View style={styles.modalButtons}>
-            <Pressable
-              onPress={() => {
-                setDeleteModalVisible(false);
-                setPendingDeleteId(null);
-              }}
-              style={[styles.modalButton, styles.cancelButton]}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </Pressable>
+      {deleteModalVisible && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Delete Task?</Text>
+            <Text style={styles.modalMessage}>This will permanently delete the task.</Text>
 
-            <Pressable
-              onPress={() => {
-                if (pendingDeleteId !== null) {
-                  setTasks(prev => prev.filter(task => task.id !== pendingDeleteId));
-                }
-                setDeleteModalVisible(false);
-                setPendingDeleteId(null);
-              }}
-              style={[styles.modalButton, styles.deleteButton]}
-            >
-              <Text style={styles.buttonText}>Delete</Text>
-            </Pressable>
+            <View style={styles.modalButtons}>
+              <Pressable
+                onPress={() => {
+                  setDeleteModalVisible(false);
+                  setPendingDeleteId(null);
+                }}
+                style={[styles.modalButton, styles.cancelButton]}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  if (pendingDeleteId !== null) {
+                    setTasks(prev => prev.filter(task => task.id !== pendingDeleteId));
+                  }
+                  setDeleteModalVisible(false);
+                  setPendingDeleteId(null);
+                }}
+                style={[styles.modalButton, styles.deleteButton]}
+              >
+                <Text style={styles.buttonText}>Delete</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
-    )}
+      )}
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

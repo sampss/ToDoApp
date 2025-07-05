@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Task } from '@typesafe/TaskTypes';
 import DateUtils from '@utils/dateUtils';
 
@@ -17,7 +18,7 @@ type Props = {
   task: Task;
   visible: boolean;
   onClose: () => void;
-  onSave: (updatedDetails: string) => void;
+  onSave: (updatedDetails: string, updatedDate?: string) => void;
   initialEditMode?: boolean;
 };
 
@@ -30,16 +31,19 @@ const TaskDetailsModal: React.FC<Props> = ({
 }) => {
   const [isEditing, setIsEditing] = useState(initialEditMode || false);
   const [editedDetails, setEditedDetails] = useState(task.details || '');
+  const [editedDate, setEditedDate] = useState(task.completeBy);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setIsEditing(initialEditMode || false);
       setEditedDetails(task.details || '');
+      setEditedDate(task.completeBy);
     }
-  }, [visible, initialEditMode, task.details]);
+  }, [visible, initialEditMode, task.details, task.completeBy]);
 
   const handleSave = () => {
-    onSave(editedDetails.trim());
+    onSave(editedDetails.trim(), editedDate);
     setIsEditing(false);
     onClose();
   };
@@ -60,19 +64,47 @@ const TaskDetailsModal: React.FC<Props> = ({
               </Pressable>
             </View>
 
-            {/* Created date */}
+            {/* Created Date */}
             <Text style={styles.timestamp}>
               Created: {DateUtils.formatDateForUI(task.createdAt)}
             </Text>
 
-            {/* Due date */}
-            {task.completeBy && (
-              <Text style={styles.due}>
-                📅 Complete by: {DateUtils.formatDateForUI(task.completeBy)}
-              </Text>
+            {/* Due Date */}
+            {isEditing ? (
+              <>
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  style={styles.dateButton}
+                >
+                  <Text style={styles.dateButtonText}>
+                    {editedDate
+                      ? `📅 ${new Date(editedDate).toDateString()}`
+                      : '📅 Set Due Date'}
+                  </Text>
+                </Pressable>
+                {showDatePicker && (
+                  <DateTimePicker
+                    value={editedDate ? new Date(editedDate) : new Date()}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, selectedDate) => {
+                      setShowDatePicker(false);
+                      if (event.type !== 'dismissed' && selectedDate) {
+                        setEditedDate(selectedDate.toISOString());
+                      }
+                    }}
+                  />
+                )}
+              </>
+            ) : (
+              editedDate && (
+                <Text style={styles.due}>
+                  📅 Complete by: {DateUtils.formatDateForUI(editedDate)}
+                </Text>
+              )
             )}
 
-            {/* Details */}
+            {/* Details Field */}
             {isEditing ? (
               <TextInput
                 style={styles.textarea}
@@ -83,12 +115,12 @@ const TaskDetailsModal: React.FC<Props> = ({
               />
             ) : (
               <Text style={styles.details}>
-                {task.details?.trim() || 'No details provided.'}
+                {editedDetails.trim() || 'No details provided.'}
               </Text>
             )}
           </ScrollView>
 
-          {/* Footer */}
+          {/* Footer Buttons */}
           <View style={styles.footer}>
             <Pressable style={styles.button} onPress={onClose}>
               <Text style={styles.buttonText}>Close</Text>
@@ -142,7 +174,6 @@ const styles = StyleSheet.create({
   timestamp: {
     fontSize: 12,
     color: '#777',
-    marginTop: 2,
     marginBottom: 6,
   },
   due: {
@@ -163,6 +194,20 @@ const styles = StyleSheet.create({
     minHeight: 100,
     textAlignVertical: 'top',
     marginBottom: 12,
+  },
+  dateButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: '#aaa',
+    alignSelf: 'flex-start',
+    marginBottom: 12,
+  },
+  dateButtonText: {
+    fontSize: 14,
+    color: '#333',
   },
   footer: {
     flexDirection: 'row',

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
-import { Task } from 'modules/types/Task';
+import { Task } from '@typesafe/Task';
 import DateUtils from '@utils/dateUtils';
 import TaskDetailsModal from '@components/TaskDetailsModal';
 
@@ -8,10 +8,10 @@ type Props = {
   task: Task;
   onToggleComplete: (taskId: number) => void;
   onDelete: (taskId: number) => void;
-  onUpdateDetails?: (id: number, details: string) => void;
+  onUpdateDetails?: (id: number, details: string, completeBy?: string) => void;
 };
 
-  const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateDetails }) => {
+const TaskCard: React.FC<Props> = ({ task, onToggleComplete, onDelete, onUpdateDetails }) => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
 
@@ -20,9 +20,9 @@ type Props = {
     new Date(task.completeBy) < new Date() &&
     !task.completed;
 
-  const handleDetailsSave = (id: number, newDetails: string) => {
+  const handleDetailsSave = (id: number, newDetails: string, newDate?: string) => {
     if (onUpdateDetails) {
-      onUpdateDetails(id, newDetails);
+      onUpdateDetails(id, newDetails, newDate);
     }
   };
 
@@ -31,7 +31,15 @@ type Props = {
       {/* Top Row: DETAILS Center + Pencil Right */}
       <View style={styles.topRow}>
         <View style={styles.detailsWrapper}>
-          <Text style={styles.detailsLink} onPress={() => setDetailsOpen(true)}>DETAILS</Text>
+          <Text
+            style={styles.detailsLink}
+            onPress={() => {
+              setDetailsOpen(true);
+              setEditMode(false);
+            }}
+          >
+            DETAILS
+          </Text>
         </View>
         <View style={styles.pencilWrapper}>
           <Pressable
@@ -78,12 +86,14 @@ type Props = {
       <TaskDetailsModal
         task={task}
         visible={detailsOpen}
-        initialEditMode={editMode} // ✨ Add this line
+        initialEditMode={editMode}
         onClose={() => {
           setDetailsOpen(false);
           setEditMode(false);
         }}
-        onSave={(newDetails) => handleDetailsSave(task.id, newDetails)}
+        onSave={(newDetails, newDate) =>
+          handleDetailsSave(task.id, newDetails, newDate)
+        }
       />
     </View>
   );
