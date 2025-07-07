@@ -1,97 +1,118 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 🗂️ ToDoApp – Modular Task Management for HomeManager Suite
 
-# Getting Started
+ToDoApp is a standalone, plugin-ready task management module designed to operate independently or as part of the scalable **HomeManager** ecosystem. It supports multi-user profiles, cross-module integration, offline-first access, and optional ad monetization.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## 🚀 MVP Feature Set
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+The initial build includes essential task management functionality:
+- ✅ Task creation, editing, deletion
+- 🕒 Due dates, priority tags, and status tracking
+- 🗂️ Filter and sort by tag, date, priority
+- 💾 SQLite-backed local storage with offline access
+- 🎨 Theming and accessibility (dark mode, font scaling)
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+---
 
-```sh
-# Using npm
-npm start
+## 🌱 Modular Enhancements (Optional Plugins)
 
-# OR using Yarn
-yarn start
-```
+Future-ready features can be added without affecting core logic:
+- 🔁 Recurring task engine
+- 🔗 Task dependencies and visual flow
+- ⏳ Pomodoro timer plugin
+- 🗣️ Voice input module
+- 📆 Calendar view integration
+- 🎯 Goal-setting and streak tracking
+- 📊 Productivity analytics dashboard
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 👥 Multi-User Architecture
 
-### Android
+ToDoApp supports shared devices and centralized data per user:
+- `user_id` scoped data in both local storage and remote DB
+- Local caching supports device-default user and temporary guest profiles
+- Planned sync logic for user-specific task syncing from cloud
+- User switcher UI with identity context across modules
 
-```sh
-# Using npm
-npm run android
+---
 
-# OR using Yarn
-yarn android
-```
+## 🔄 Integration with HomeManager Ecosystem
 
-### iOS
+Designed for seamless communication with sibling modules:
+- InventoryManager: Tasks can reference tracked items
+- FinanceTracker: Scheduled payments trigger actionable tasks
+- HomeMaintenanceLog: Completed tasks feed into logs or reports
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+Shared services across modules:
+- Centralized theme engine
+- Notification dispatcher
+- User preferences handler
+- Cross-module event hooks (e.g., `onTaskComplete`)
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+---
 
-```sh
-bundle install
-```
+## 📱 Cross-Platform Strategy
 
-Then, and every time you update your native dependencies, run:
+ToDoApp is built with compatibility for mobile and web:
+- Reusable UI components across React Native and React Web
+- Service abstraction for storage (SQLite, async storage, local cache, cloud sync)
 
-```sh
-bundle exec pod install
-```
+---
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 📢 Ad Monetization (Web & Mobile)
 
-```sh
-# Using npm
-npm run ios
+Optional support for non-intrusive advertisements:
+- Google AdMob or AdSense integration via modular `AdModule`
+- Responsive layouts with designated ad containers
+- Conditional rendering based on network, user tier, and screen size
+- Premium users can disable ads via settings or HomeManager tiering
 
-# OR using Yarn
-yarn ios
-```
+Ad Placement Ideas:
+- Home screen banner (dismissible)
+- Footer of task list
+- “Tips & Insights” pane on analytics page
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 🏗️ Folder Structure (Sample)
+<pre><code>
+HomeManager/
+│
+├── modules/
+│   ├── ToDoApp/
+│   │   ├── components/
+│   │   ├── screens/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   └── utils/
+│   └── InventoryManager/
+│
+├── shared/
+│   ├── auth/
+│   ├── theme/
+│   ├── notifications/
+│   └── userContext/
 
-## Step 3: Modify your app
+</code></pre>
 
-Now that you have successfully run the app, let's make changes!
+---
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## 📋 Setup & Usage
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+> _Coming soon in implementation phase._  
+Initial setup will include local dev instructions, database schema generation, and modular registration guidelines.
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+---
 
-## Congratulations! :tada:
+## 📬 License & Attribution
 
-You've successfully run and modified your React Native App. :partying_face:
+MIT License.  
+Created by Shawn Sampson with modular architecture principles and cross-platform vision.
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## ✨ Contributions
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Feature suggestions, bug reports, and ideas for plugin modules are always welcome. This project was designed for scalable collaboration and future growth.
